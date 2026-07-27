@@ -53,6 +53,13 @@ def assess_risk(
         score -= 20
         reasons.append("Fixed code is much shorter than original.")
 
+    # Over-editing signal: a fix that substantially GROWS the file is also risky.
+    # The prompt asks the model to make minimal changes, so large additions
+    # suggest the fix did more than the issues required.
+    if len(fixed_lines) > len(original_lines) * 1.25:
+        score -= 25
+        reasons.append("Fixed code is substantially longer than original (possible over-edit).")
+
     if "return" in original_code and "return" not in fixed_code:
         score -= 30
         reasons.append("Return statements may have been removed.")
